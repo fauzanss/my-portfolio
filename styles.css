@@ -119,6 +119,32 @@ body {
   width: 100%;
 }
 
+.language-switcher {
+  display: flex;
+  gap: 0.5rem;
+  margin-right: 1rem;
+}
+
+.lang-btn {
+  background: transparent;
+  border: 1px solid rgba(0, 255, 65, 0.3);
+  color: var(--text-white);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.lang-btn:hover,
+.lang-btn.active {
+  background: var(--primary-green);
+  color: var(--primary-black);
+  border-color: var(--primary-green);
+  box-shadow: var(--glow-green);
+}
+
 .hamburger {
   display: none;
   flex-direction: column;
@@ -1089,4 +1115,61 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-green);
+}
+
+/* Performance Optimizations */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Lazy loading styles */
+img[loading="lazy"] {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+img[loading="lazy"].loaded {
+  opacity: 1;
+}
+
+/* Preload critical resources */
+.preload {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  visibility: hidden;
+}
+
+/* Optimize animations for performance */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* GPU acceleration for smooth animations */
+.project-card,
+.skill-item,
+.client-logo {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Optimize font loading */
+@font-face {
+  font-family: 'Inter';
+  font-display: swap;
+  src: url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+}
+
+@font-face {
+  font-family: 'Orbitron';
+  font-display: swap;
+  src: url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
 }

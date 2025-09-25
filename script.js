@@ -395,6 +395,114 @@ function createScrollProgress() {
 // Initialize scroll progress
 document.addEventListener('DOMContentLoaded', createScrollProgress);
 
+// Performance Optimizations
+// Lazy loading for images
+function initLazyLoading() {
+  const images = document.querySelectorAll('img[loading="lazy"]');
+
+  if ('IntersectionObserver' in window) {
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          img.classList.add('loaded');
+          observer.unobserve(img);
+        }
+      });
+    });
+
+    images.forEach(img => imageObserver.observe(img));
+  } else {
+    // Fallback for browsers without IntersectionObserver
+    images.forEach(img => img.classList.add('loaded'));
+  }
+}
+
+// Debounce function for scroll events
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+// Optimized scroll handler
+const optimizedScrollHandler = debounce(() => {
+  const navbar = document.querySelector('.navbar');
+  if (window.scrollY > 50) {
+    navbar.style.background = 'rgba(10, 10, 10, 0.98)';
+    navbar.style.boxShadow = '0 2px 20px rgba(0, 255, 65, 0.1)';
+  } else {
+    navbar.style.background = 'rgba(10, 10, 10, 0.95)';
+    navbar.style.boxShadow = 'none';
+  }
+}, 10);
+
+// Replace the existing scroll event listener
+window.removeEventListener('scroll', () => {
+  const navbar = document.querySelector('.navbar');
+  if (window.scrollY > 50) {
+    navbar.style.background = 'rgba(10, 10, 10, 0.98)';
+    navbar.style.boxShadow = '0 2px 20px rgba(0, 255, 65, 0.1)';
+  } else {
+    navbar.style.background = 'rgba(10, 10, 10, 0.95)';
+    navbar.style.boxShadow = 'none';
+  }
+});
+
+window.addEventListener('scroll', optimizedScrollHandler);
+
+// Preload critical resources
+function preloadCriticalResources() {
+  const criticalImages = [
+    'my-photo.png',
+    'clients/bnpb-logo.png',
+    'clients/kredivo-logo.png'
+  ];
+
+  criticalImages.forEach(src => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = src;
+    document.head.appendChild(link);
+  });
+}
+
+// Optimize animations based on user preference
+function optimizeAnimations() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.documentElement.style.setProperty('--transition', 'none');
+    document.documentElement.style.setProperty('--glow-green', 'none');
+    document.documentElement.style.setProperty('--glow-green-strong', 'none');
+  }
+}
+
+// Initialize performance optimizations
+document.addEventListener('DOMContentLoaded', () => {
+  initLazyLoading();
+  preloadCriticalResources();
+  optimizeAnimations();
+});
+
+// Service Worker registration for caching
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('SW registered: ', registration);
+      })
+      .catch(registrationError => {
+        console.log('SW registration failed: ', registrationError);
+      });
+  });
+}
+
 // Add loading animation
 window.addEventListener('load', () => {
   document.body.classList.add('loaded');
@@ -413,3 +521,159 @@ loadingStyle.textContent = `
     }
 `;
 document.head.appendChild(loadingStyle);
+
+// Internationalization (i18n) functionality
+let currentLanguage = localStorage.getItem('language') || 'en';
+
+// Language data
+const translations = {
+  en: {
+    'About Me': 'About Me',
+    'I\'m a passionate full-stack developer with expertise in modern web technologies. I love creating efficient, scalable, and user-friendly applications that solve real-world problems.': 'I\'m a passionate full-stack developer with expertise in modern web technologies. I love creating efficient, scalable, and user-friendly applications that solve real-world problems.',
+    'With a strong foundation in both frontend and backend development, I bring ideas to life through clean code and innovative solutions.': 'With a strong foundation in both frontend and backend development, I bring ideas to life through clean code and innovative solutions.',
+    'Years Experience': 'Years Experience',
+    'Projects Completed': 'Projects Completed',
+    'Skills & Technologies': 'Skills & Technologies',
+    'Frontend': 'Frontend',
+    'Backend': 'Backend',
+    'Tools & Others': 'Tools & Others',
+    'Featured Projects': 'Featured Projects',
+    'Delivered Projects': 'Delivered Projects',
+    'Trusted by leading organizations and companies': 'Trusted by leading organizations and companies',
+    'Get In Touch': 'Get In Touch',
+    'Let\'s work together!': 'Let\'s work together!',
+    'I\'m always interested in new opportunities and exciting projects. Feel free to reach out if you\'d like to collaborate.': 'I\'m always interested in new opportunities and exciting projects. Feel free to reach out if you\'d like to collaborate.',
+    'Send Message': 'Send Message',
+    'Your Name': 'Your Name',
+    'Your Email': 'Your Email',
+    'Your Phone Number': 'Your Phone Number',
+    'Subject': 'Subject',
+    'Your Message': 'Your Message'
+  },
+  id: {
+    'About Me': 'Tentang Saya',
+    'I\'m a passionate full-stack developer with expertise in modern web technologies. I love creating efficient, scalable, and user-friendly applications that solve real-world problems.': 'Saya adalah developer full-stack yang berpassion dengan keahlian dalam teknologi web modern. Saya suka menciptakan aplikasi yang efisien, scalable, dan user-friendly yang menyelesaikan masalah dunia nyata.',
+    'With a strong foundation in both frontend and backend development, I bring ideas to life through clean code and innovative solutions.': 'Dengan fondasi yang kuat dalam pengembangan frontend dan backend, saya mewujudkan ide-ide melalui kode yang bersih dan solusi inovatif.',
+    'Years Experience': 'Tahun Pengalaman',
+    'Projects Completed': 'Proyek Selesai',
+    'Skills & Technologies': 'Keahlian & Teknologi',
+    'Frontend': 'Frontend',
+    'Backend': 'Backend',
+    'Tools & Others': 'Tools & Lainnya',
+    'Featured Projects': 'Proyek Unggulan',
+    'Delivered Projects': 'Proyek yang Diselesaikan',
+    'Trusted by leading organizations and companies': 'Dipercaya oleh organisasi dan perusahaan terkemuka',
+    'Get In Touch': 'Hubungi Saya',
+    'Let\'s work together!': 'Mari bekerja sama!',
+    'I\'m always interested in new opportunities and exciting projects. Feel free to reach out if you\'d like to collaborate.': 'Saya selalu tertarik dengan peluang baru dan proyek yang menarik. Jangan ragu untuk menghubungi saya jika Anda ingin berkolaborasi.',
+    'Send Message': 'Kirim Pesan',
+    'Your Name': 'Nama Anda',
+    'Your Email': 'Email Anda',
+    'Your Phone Number': 'Nomor Telepon Anda',
+    'Subject': 'Subjek',
+    'Your Message': 'Pesan Anda'
+  }
+};
+
+// Function to update content based on current language
+function updateContent() {
+  // First, update elements with data attributes (this is the primary method)
+  const elements = document.querySelectorAll('[data-en], [data-id]');
+
+  elements.forEach(element => {
+    const enText = element.getAttribute('data-en');
+    const idText = element.getAttribute('data-id');
+
+    if (currentLanguage === 'id' && idText) {
+      element.textContent = idText;
+    } else if (currentLanguage === 'en' && enText) {
+      element.textContent = enText;
+    }
+  });
+
+  // Update form placeholders using data attributes
+  const formInputs = document.querySelectorAll('input[data-placeholder-en], textarea[data-placeholder-en]');
+  formInputs.forEach(input => {
+    const enPlaceholder = input.getAttribute('data-placeholder-en');
+    const idPlaceholder = input.getAttribute('data-placeholder-id');
+
+    if (currentLanguage === 'id' && idPlaceholder) {
+      input.setAttribute('placeholder', idPlaceholder);
+    } else if (currentLanguage === 'en' && enPlaceholder) {
+      input.setAttribute('placeholder', enPlaceholder);
+    }
+  });
+
+  // Update section titles using data attributes
+  const sectionTitles = document.querySelectorAll('.section-title .glow-text[data-en], .section-title .glow-text[data-id]');
+  sectionTitles.forEach(title => {
+    const enText = title.getAttribute('data-en');
+    const idText = title.getAttribute('data-id');
+
+    if (currentLanguage === 'id' && idText) {
+      title.textContent = idText;
+    } else if (currentLanguage === 'en' && enText) {
+      title.textContent = enText;
+    }
+  });
+
+  // Update navigation links using data attributes
+  const navLinks = document.querySelectorAll('.nav-link[data-en], .nav-link[data-id]');
+  navLinks.forEach(link => {
+    const enText = link.getAttribute('data-en');
+    const idText = link.getAttribute('data-id');
+
+    if (currentLanguage === 'id' && idText) {
+      link.textContent = idText;
+    } else if (currentLanguage === 'en' && enText) {
+      link.textContent = enText;
+    }
+  });
+
+  // Update hero buttons using data attributes
+  const heroButtons = document.querySelectorAll('.hero-buttons a[data-en], .hero-buttons a[data-id]');
+  heroButtons.forEach(button => {
+    const enText = button.getAttribute('data-en');
+    const idText = button.getAttribute('data-id');
+
+    if (currentLanguage === 'id' && idText) {
+      button.textContent = idText;
+    } else if (currentLanguage === 'en' && enText) {
+      button.textContent = enText;
+    }
+  });
+}
+
+// Language switcher functionality
+document.addEventListener('DOMContentLoaded', () => {
+  const langButtons = document.querySelectorAll('.lang-btn');
+
+  langButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      // Remove active class from all buttons
+      langButtons.forEach(btn => btn.classList.remove('active'));
+
+      // Add active class to clicked button
+      button.classList.add('active');
+
+      // Update current language
+      currentLanguage = button.getAttribute('data-lang');
+      localStorage.setItem('language', currentLanguage);
+
+      // Update content
+      updateContent();
+    });
+  });
+
+  // Set initial language
+  const savedLang = localStorage.getItem('language') || 'en';
+  const activeButton = document.querySelector(`[data-lang="${savedLang}"]`);
+  if (activeButton) {
+    langButtons.forEach(btn => btn.classList.remove('active'));
+    activeButton.classList.add('active');
+    currentLanguage = savedLang;
+  }
+
+  // Update content on page load
+  updateContent();
+});
