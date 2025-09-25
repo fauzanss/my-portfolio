@@ -677,3 +677,32 @@ document.addEventListener('DOMContentLoaded', () => {
   // Update content on page load
   updateContent();
 });
+
+// Pricing cards expand/collapse functionality
+document.addEventListener('DOMContentLoaded', function () {
+  const expandButtons = document.querySelectorAll('.expand-btn');
+
+  expandButtons.forEach(button => {
+    button.addEventListener('click', function () {
+      const pricingCard = this.closest('.pricing-card');
+      const features = pricingCard.querySelector('.pricing-features');
+      const icon = this.querySelector('.expand-icon');
+      const text = this.querySelector('.expand-text');
+
+      // Toggle expanded state
+      if (features.classList.contains('collapsed')) {
+        features.classList.remove('collapsed');
+        features.classList.add('expanded');
+        this.classList.add('expanded');
+        icon.style.transform = 'rotate(180deg)';
+        text.textContent = text.getAttribute('data-en') === 'View Details' ? 'Hide Details' : 'Sembunyikan Detail';
+      } else {
+        features.classList.remove('expanded');
+        features.classList.add('collapsed');
+        this.classList.remove('expanded');
+        icon.style.transform = 'rotate(0deg)';
+        text.textContent = text.getAttribute('data-en') === 'View Details' ? 'View Details' : 'Lihat Detail';
+      }
+    });
+  });
+});
