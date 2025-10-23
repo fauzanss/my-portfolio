@@ -1,7 +1,5 @@
-// Service Worker for Portfolio Caching
-const CACHE_NAME = 'portfolio-v2.0.1';
-const STATIC_CACHE = 'portfolio-static-v2.0.1';
-const DYNAMIC_CACHE = 'portfolio-dynamic-v2.0.1';
+// Service Worker for Portfolio Caching - Simple Version
+const CACHE_NAME = 'portfolio-simple-v1';
 
 const urlsToCache = [
   '/',
@@ -20,58 +18,27 @@ const urlsToCache = [
 self.addEventListener('install', event => {
   console.log('Service Worker installing...');
   event.waitUntil(
-    caches.open(STATIC_CACHE)
+    caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened static cache');
+        console.log('Opened cache');
         return cache.addAll(urlsToCache);
-      })
-      .then(() => {
-        // Force activation of new service worker
-        return self.skipWaiting();
       })
   );
 });
 
-// Fetch event
+// Fetch event - Simple caching strategy
 self.addEventListener('fetch', event => {
-  const request = event.request;
-  const url = new URL(request.url);
-
-  // Skip caching for non-GET requests
-  if (request.method !== 'GET') {
-    return;
-  }
-
-  // Network first strategy for HTML files
-  if (request.destination === 'document') {
-    event.respondWith(
-      fetch(request)
-        .then(response => {
-          if (response.status === 200) {
-            const responseClone = response.clone();
-            caches.open(DYNAMIC_CACHE).then(cache => {
-              cache.put(request, responseClone);
-            });
-          }
-          return response;
-        })
-        .catch(() => {
-          return caches.match(request);
-        })
-    );
-    return;
-  }
-
-  // Cache first strategy for static assets
   event.respondWith(
-    caches.match(request)
+    caches.match(event.request)
       .then(response => {
+        // Return cached version if available
         if (response) {
           return response;
         }
 
-        return fetch(request)
-          .then(response => {
+        // Otherwise fetch from network
+        return fetch(event.request).then(
+          response => {
             // Check if we received a valid response
             if (!response || response.status !== 200 || response.type !== 'basic') {
               return response;
@@ -80,19 +47,14 @@ self.addEventListener('fetch', event => {
             // Clone the response
             const responseToCache = response.clone();
 
-            caches.open(DYNAMIC_CACHE)
+            caches.open(CACHE_NAME)
               .then(cache => {
-                cache.put(request, responseToCache);
+                cache.put(event.request, responseToCache);
               });
 
             return response;
-          })
-          .catch(() => {
-            // Return offline page for navigation requests
-            if (request.destination === 'document') {
-              return caches.match('/index.html');
-            }
-          });
+          }
+        );
       })
   );
 });
@@ -100,7 +62,7 @@ self.addEventListener('fetch', event => {
 // Activate event
 self.addEventListener('activate', event => {
   console.log('Service Worker activating...');
-  const cacheWhitelist = [STATIC_CACHE, DYNAMIC_CACHE];
+  const cacheWhitelist = [CACHE_NAME];
 
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -112,19 +74,12 @@ self.addEventListener('activate', event => {
           }
         })
       );
-    }).then(() => {
-      // Take control of all clients immediately
-      return self.clients.claim();
     })
   );
 });
 
 // Message event for cache invalidation
 self.addEventListener('message', event => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-
   if (event.data && event.data.type === 'CLEAR_CACHE') {
     event.waitUntil(
       caches.keys().then(cacheNames => {

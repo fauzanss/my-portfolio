@@ -6,24 +6,24 @@ Website mengalami masalah caching yang sangat agresif, sehingga perubahan tidak 
 
 ## Solusi yang Diterapkan
 
-### 1. Service Worker Update
+### 1. Simple Service Worker
 
-- **Versioning**: Cache name diubah dari `portfolio-v1` ke `portfolio-v2.0.1`
-- **Network First Strategy**: HTML files menggunakan network-first strategy
-- **Cache Invalidation**: Automatic cache clearing untuk old versions
-- **Skip Waiting**: Force activation untuk service worker baru
+- **Simple Caching**: Cache name `portfolio-simple-v1` tanpa versioning kompleks
+- **Cache First Strategy**: Simple cache-first strategy untuk semua assets
+- **No Auto Update**: Disabled auto update checking untuk mencegah reload terus-menerus
+- **Manual Cache Clear**: Cache hanya di-clear manual jika diperlukan
 
 ### 2. Cache Control Headers
 
 - **HTML Meta Tags**: Added no-cache headers untuk HTML
-- **Versioned Assets**: CSS dan JS files dengan versioning (`?v=2.0.1`)
-- **Server Headers**: `.htaccess` file untuk Apache server
+- **No Versioning**: Removed versioning dari CSS dan JS files
+- **Simple Strategy**: Caching yang lebih sederhana dan tidak mengganggu
 
 ### 3. Development Tools
 
 - **Cache Clear Button**: Button untuk clear cache di localhost
-- **Auto Update Detection**: Automatic detection untuk service worker updates
-- **Console Logging**: Better logging untuk debugging
+- **No Auto Reload**: Tidak ada auto reload yang mengganggu
+- **Manual Control**: User bisa control kapan mau clear cache
 
 ## Cara Menggunakan
 
@@ -36,8 +36,8 @@ Website mengalami masalah caching yang sangat agresif, sehingga perubahan tidak 
 ### Untuk Production:
 
 1. Deploy website dengan file-file yang sudah diupdate
-2. Browser akan otomatis detect service worker update
-3. Page akan otomatis reload tanpa notifikasi mengganggu
+2. Website akan load dengan caching yang sederhana
+3. Tidak ada auto reload yang mengganggu - user control penuh
 
 ### Manual Cache Clear:
 

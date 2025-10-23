@@ -144,7 +144,7 @@
       }
     }
     </script>
-  <link rel="stylesheet" href="styles.css?v=2.0.1">
+  <link rel="stylesheet" href="styles.css">
   <link
     href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap"
     rel="stylesheet">
@@ -1033,26 +1033,20 @@
     </div>
   </footer>
 
-  <script src="script.js?v=2.0.1"></script>
+  <script src="script.js"></script>
 
   <!-- Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js?v=2.0.1')
+        navigator.serviceWorker.register('/sw.js')
           .then(registration => {
             console.log('SW registered: ', registration);
 
-            // Check for updates - auto reload without notification
-            registration.addEventListener('updatefound', () => {
-              const newWorker = registration.installing;
-              newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  // Auto reload without asking user
-                  window.location.reload();
-                }
-              });
-            });
+            // Disable auto update checking to prevent constant reloading
+            // registration.addEventListener('updatefound', () => {
+            //   // No auto reload - let user manually refresh if needed
+            // });
           })
           .catch(registrationError => {
             console.log('SW registration failed: ', registrationError);
