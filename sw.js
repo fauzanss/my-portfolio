@@ -1,5 +1,8 @@
 // Service Worker for Portfolio Caching
-const CACHE_NAME = 'portfolio-v1';
+const CACHE_NAME = 'portfolio-v2.0.1';
+const STATIC_CACHE = 'portfolio-static-v2.0.1';
+const DYNAMIC_CACHE = 'portfolio-dynamic-v2.0.1';
+
 const urlsToCache = [
   '/',
   '/index.html',
@@ -15,27 +18,60 @@ const urlsToCache = [
 
 // Install event
 self.addEventListener('install', event => {
+  console.log('Service Worker installing...');
   event.waitUntil(
-    caches.open(CACHE_NAME)
+    caches.open(STATIC_CACHE)
       .then(cache => {
-        console.log('Opened cache');
+        console.log('Opened static cache');
         return cache.addAll(urlsToCache);
+      })
+      .then(() => {
+        // Force activation of new service worker
+        return self.skipWaiting();
       })
   );
 });
 
 // Fetch event
 self.addEventListener('fetch', event => {
+  const request = event.request;
+  const url = new URL(request.url);
+
+  // Skip caching for non-GET requests
+  if (request.method !== 'GET') {
+    return;
+  }
+
+  // Network first strategy for HTML files
+  if (request.destination === 'document') {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          if (response.status === 200) {
+            const responseClone = response.clone();
+            caches.open(DYNAMIC_CACHE).then(cache => {
+              cache.put(request, responseClone);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          return caches.match(request);
+        })
+    );
+    return;
+  }
+
+  // Cache first strategy for static assets
   event.respondWith(
-    caches.match(event.request)
+    caches.match(request)
       .then(response => {
-        // Cache hit - return response
         if (response) {
           return response;
         }
 
-        return fetch(event.request).then(
-          response => {
+        return fetch(request)
+          .then(response => {
             // Check if we received a valid response
             if (!response || response.status !== 200 || response.type !== 'basic') {
               return response;
@@ -44,31 +80,60 @@ self.addEventListener('fetch', event => {
             // Clone the response
             const responseToCache = response.clone();
 
-            caches.open(CACHE_NAME)
+            caches.open(DYNAMIC_CACHE)
               .then(cache => {
-                cache.put(event.request, responseToCache);
+                cache.put(request, responseToCache);
               });
 
             return response;
-          }
-        );
+          })
+          .catch(() => {
+            // Return offline page for navigation requests
+            if (request.destination === 'document') {
+              return caches.match('/index.html');
+            }
+          });
       })
   );
 });
 
 // Activate event
 self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
+  console.log('Service Worker activating...');
+  const cacheWhitelist = [STATIC_CACHE, DYNAMIC_CACHE];
 
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
+            console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
+    }).then(() => {
+      // Take control of all clients immediately
+      return self.clients.claim();
     })
   );
+});
+
+// Message event for cache invalidation
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+
+  if (event.data && event.data.type === 'CLEAR_CACHE') {
+    event.waitUntil(
+      caches.keys().then(cacheNames => {
+        return Promise.all(
+          cacheNames.map(cacheName => {
+            return caches.delete(cacheName);
+          })
+        );
+      })
+    );
+  }
 });

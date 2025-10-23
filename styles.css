@@ -470,6 +470,21 @@ section {
   overflow: hidden;
 }
 
+/* Consultation Banner in Hero Section */
+.hero-consultation {
+  margin: 2rem auto;
+  max-width: 1200px;
+  border-radius: 15px;
+  border: 1px solid rgba(0, 255, 65, 0.2);
+}
+
+/* Consultation Banner in Pricing Section */
+.pricing-consultation {
+  margin-top: 3rem;
+  border-radius: 15px;
+  border: 1px solid rgba(0, 255, 65, 0.2);
+}
+
 .consultation-banner::before {
   content: '';
   position: absolute;
@@ -781,6 +796,41 @@ section {
   font-weight: 600;
   font-size: 0.9rem;
   z-index: 10;
+}
+
+/* Mobile responsive for popular badge */
+@media (max-width: 768px) {
+  .popular-badge {
+    position: relative;
+    top: 0;
+    left: 0;
+    transform: none;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    text-align: center;
+    display: block;
+    width: 100%;
+    font-size: 0.8rem;
+    padding: 0.4rem 1rem;
+    z-index: 1;
+    order: -1;
+  }
+
+  .pricing-header {
+    padding-top: 0;
+    margin-top: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pricing-card.featured .pricing-header {
+    padding-top: 0;
+  }
+
+  .pricing-card.featured {
+    position: relative;
+    overflow: visible;
+  }
 }
 
 .pricing-header {

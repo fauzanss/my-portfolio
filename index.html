@@ -51,6 +51,12 @@
   <!-- Additional Meta Tags -->
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#00ff41">
+
+  <!-- Cache Control -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
   <link rel="canonical" href="https://fauzan-portfolio.surge.sh/">
   <link rel="alternate" hreflang="en" href="https://fauzan-portfolio.surge.sh/">
   <link rel="alternate" hreflang="id" href="https://fauzan-portfolio.surge.sh/">
@@ -65,6 +71,9 @@
   <link rel="icon" type="image/png" sizes="16x16" href="my-logo.png">
   <link rel="apple-touch-icon" sizes="180x180" href="my-logo.png">
   <link rel="shortcut icon" href="my-logo.png">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
 
   <!-- Additional Social Media Meta Tags -->
   <meta property="og:image:type" content="image/png">
@@ -135,7 +144,7 @@
       }
     }
     </script>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=2.0.1">
   <link
     href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap"
     rel="stylesheet">
@@ -233,7 +242,7 @@
   </section>
 
   <!-- Consultation Banner -->
-  <section class="consultation-banner">
+  <section class="consultation-banner hero-consultation">
     <div class="container">
       <div class="banner-content">
         <div class="banner-text">
@@ -330,6 +339,14 @@
               <span>React Native</span>
             </div>
             <div class="skill-item">
+              <i class="fab fa-css3-alt"></i>
+              <span>Tailwind CSS</span>
+            </div>
+            <div class="skill-item">
+              <i class="fab fa-react"></i>
+              <span>Next.js</span>
+            </div>
+            <div class="skill-item">
               <i class="fab fa-angular"></i>
               <span>Angular</span>
             </div>
@@ -419,6 +436,10 @@
               <i class="fas fa-chart-line"></i>
               <span>Analytics</span>
             </div>
+            <div class="skill-item">
+              <i class="fab fa-wordpress"></i>
+              <span>WordPress</span>
+            </div>
           </div>
         </div>
 
@@ -492,8 +513,8 @@
 
         <!-- Package B - Professional -->
         <div class="pricing-card featured" data-package="b">
-          <div class="popular-badge" data-en="Most Popular" data-id="Paling Populer">Most Popular</div>
           <div class="pricing-header">
+            <div class="popular-badge" data-en="Most Popular" data-id="Paling Populer">Most Popular</div>
             <h3 class="package-name" data-en="Package B" data-id="Paket B">Package B</h3>
             <div class="package-price">
               <span class="currency">Rp</span>
@@ -651,6 +672,26 @@
           All packages include source code, documentation, and deployment assistance. Custom requirements can be
           discussed.
         </p>
+      </div>
+
+      <!-- Consultation Banner in Pricing -->
+      <div class="consultation-banner pricing-consultation">
+        <div class="container">
+          <div class="banner-content">
+            <div class="banner-text">
+              <h3 class="banner-title" data-en="Free Consultation Available!" data-id="Konsultasi Gratis Tersedia!">Free
+                Consultation Available!</h3>
+              <p class="banner-description"
+                data-en="Let's discuss your project requirements and find the perfect solution for your needs"
+                data-id="Mari diskusikan kebutuhan proyek Anda dan temukan solusi yang tepat">Let's discuss your project
+                requirements and find the perfect solution for your needs</p>
+            </div>
+            <div class="banner-action">
+              <a href="#contact" class="btn btn-banner" data-en="Get Free Consultation"
+                data-id="Dapatkan Konsultasi Gratis">Get Free Consultation</a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -992,7 +1033,62 @@
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=2.0.1"></script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js?v=2.0.1')
+          .then(registration => {
+            console.log('SW registered: ', registration);
+
+            // Check for updates
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // New content is available, reload the page
+                  if (confirm('New version available! Reload to update?')) {
+                    window.location.reload();
+                  }
+                }
+              });
+            });
+          })
+          .catch(registrationError => {
+            console.log('SW registration failed: ', registrationError);
+          });
+      });
+    }
+
+    // Force cache clear function
+    function clearCache() {
+      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_CACHE' });
+      }
+      // Also clear browser cache
+      if ('caches' in window) {
+        caches.keys().then(names => {
+          names.forEach(name => {
+            caches.delete(name);
+          });
+        });
+      }
+      location.reload();
+    }
+
+    // Add cache clear button for development
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      document.addEventListener('DOMContentLoaded', () => {
+        const clearBtn = document.createElement('button');
+        clearBtn.textContent = 'Clear Cache';
+        clearBtn.style.cssText = 'position:fixed;top:10px;right:10px;z-index:9999;background:#00ff41;color:#000;border:none;padding:10px;border-radius:5px;cursor:pointer;';
+        clearBtn.onclick = clearCache;
+        document.body.appendChild(clearBtn);
+      });
+    }
+  </script>
 </body>
 
 </html>
