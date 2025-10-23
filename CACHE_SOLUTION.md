@@ -37,7 +37,7 @@ Website mengalami masalah caching yang sangat agresif, sehingga perubahan tidak 
 
 1. Deploy website dengan file-file yang sudah diupdate
 2. Browser akan otomatis detect service worker update
-3. User akan mendapat notifikasi untuk reload page
+3. Page akan otomatis reload tanpa notifikasi mengganggu
 
 ### Manual Cache Clear:
 

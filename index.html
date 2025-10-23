@@ -1043,15 +1043,13 @@
           .then(registration => {
             console.log('SW registered: ', registration);
 
-            // Check for updates
+            // Check for updates - auto reload without notification
             registration.addEventListener('updatefound', () => {
               const newWorker = registration.installing;
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  // New content is available, reload the page
-                  if (confirm('New version available! Reload to update?')) {
-                    window.location.reload();
-                  }
+                  // Auto reload without asking user
+                  window.location.reload();
                 }
               });
             });
